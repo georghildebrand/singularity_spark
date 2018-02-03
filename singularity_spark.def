@@ -1,0 +1,45 @@
+
+#Todo: fetch driver, cudnn, cuda versions from env vars via make directives
+
+
+BootStrap: docker
+From: p7hb/docker-spark
+
+
+%runscript
+    # When executed, the container will run this
+    # chaining spark to slurm allocation
+    # Note: no binding to cpu_ids currently implemented
+    # todo tomorrow
+    export SPARK_WORKER_CORES=$SLURM_JOB_CPUS_PER_NODE
+    export SPARK_DAEMON_MEMORY=$(( $SLURM_MEM_PER_CPU * $SLURM_CPUS_PER_TASK / 2 ))
+    
+    #jupyter setup
+    export XDG_RUNTIME_DIR="" # this avoids runfile erros
+
+
+%setup
+
+    # Runs from outside the container during Bootstrap
+        
+
+%post
+    # Runs within the container during Bootstrap
+    # Set up some required environment defaults
+    SPARK_HOME=/usr/local/spark
+    # setting correct path
+
+    echo """
+export SCALA_HOME=/usr/local/scala
+export SBT_HOME=/usr/local/sbt
+export SPARK_HOME=$SPARK_HOME
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export PATH=$JAVA_HOME/bin:$SCALA_HOME/bin:$SBT_HOME/bin:$SPARK_HOME/bin:$SPARK_HOME/sbin:\$PATH
+""" >> /environment
+    # make spark home writeable, this is not needed by default
+    chmod -R a+rwx $SPARK_HOME
+    
+    
+%test
+    # Sanity check that the container is operating
+    
