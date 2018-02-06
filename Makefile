@@ -17,14 +17,8 @@ bootstrap:
 copy_config:
 	sudo singularity copy $(IMAGE_FILE) spark_config_slurm/* /usr/local/spark/conf
 
-copy_config_local:
-	sudo singularity copy $(IMAGE_FILE) run_local/spark-env-local.sh /usr/local/spark/conf/spark-env.sh
-
-run_local: copy_config_local
-	bash run_local/run_spark.sh $(IMAGE_FILE)
-
-run_local_pyspark_shell:
-	singularity exec $(IMAGE_FILE) /usr/local/spark/bin/pyspark --master spark://localhost:7077
+run_local:
+	bash run_local/run_spark.sh
 
 export:
 	sudo singularity export $(IMAGE_FILE) | gzip -9 > $(IMAGE_FILE).tar.gzip
